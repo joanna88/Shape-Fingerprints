@@ -16,9 +16,6 @@ def comp(refmol, fitmol):
     best = OEBestOverlay()
     best.SetRefMol(refmol)
 
-    #best.SetInitialOrientation(OEBOOrientation_Subrocs)
-    best.SetInitialOrientation(OEBOOrientation_InertialAtHeavyAtoms)
-
     scoreiter = OEBestOverlayScoreIter()
     OESortOverlayScores(scoreiter, best.Overlay(fitmol), OEHighestTanimoto())
 
@@ -38,18 +35,11 @@ def get_fingerprint(mol, Shape_database, bitOn):
     best = OEBestOverlay()
     best.SetRefMol(mol)
 
-    # sets the Initial orientation of molecules - subrocs
-
-    best.SetInitialOrientation(OEBOOrientation_InertialAtHeavyAtoms)
-    #best.SetInitialOrientation(OEBOOrientation_Subrocs)
-
     V_ref = OECalcVolume(mol)
 
     fingerprint = ''
 
     for fitmol in Shape_database.GetOEMols():
-
-        #print(fitmol.GetTitle())
 
         resCount = 0
 
@@ -70,7 +60,6 @@ def get_fingerprint(mol, Shape_database, bitOn):
         for score in scoreiter:
             outmol = OEGraphMol(fitmol.GetConf(OEHasConfIdx(score.fitconfidx)))
             score.Transform(outmol)
-            #print(score.tanimoto)
 
             if float(score.tanimoto) > bitOn:
                 fingerprint += ' 1'
@@ -86,7 +75,7 @@ def get_fingerprint(mol, Shape_database, bitOn):
 def main(argv=[__name__]):
 
     if len(argv) != 5:
-        OEThrow.Usage("%s <data_file.sdf> <shape_file.sdf> <out_file.sdf> <bitOn> " % argv[0])
+        OEThrow.Usage("%s <data_file.sdf> <Shape_Database.sdf> <out_file.sdf> <BitOnValue> " % argv[0])
 
     data_file = oemolistream(argv[1])
     shape_file = OEMolDatabase(argv[2])
